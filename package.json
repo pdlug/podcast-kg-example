@@ -7,6 +7,7 @@
     "fix:lint": "eslint --fix src",
     "prettier": "prettier --check .",
     "test": "run-s test:*",
+    "test:check": "tsc --noEmit",
     "test:lint": "eslint .",
     "test:prettier": "prettier \"src\" --list-different"
   },
@@ -16,7 +17,7 @@
     "@instructor-ai/instructor": "^1.5.0",
     "kuzu": "^0.4.2",
     "llm-polyglot": "^2.0.0",
-    "openai": "^4.52.1",
+    "openai": "^4.52.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -32,7 +33,7 @@
     "eslint-plugin-unicorn": "^54.0.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.3.2",
-    "tsx": "^4.15.8",
+    "tsx": "^4.16.0",
     "typescript-eslint": "8.0.0-alpha.34"
   },
   "packageManager": "pnpm@9.4.0"

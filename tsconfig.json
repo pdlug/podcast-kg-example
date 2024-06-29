@@ -9,8 +9,7 @@
     "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": false,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "react"
+    "lib": ["ESNext", "DOM"],
+    "typeRoots": ["./typings", "node_modules/@types"]
   }
 }
