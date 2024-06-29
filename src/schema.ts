@@ -51,7 +51,7 @@ const OtherNodeSchema = BaseNodeSchema.extend({
   type: z.string().describe('The type of node'),
 }).describe('A node of an unknown type');
 
-const NodeSchema = z.union([
+export const NodeSchema = z.union([
   PodcastNodeSchema,
   EpisodeNodeSchema,
   OrganizationNodeSchema,
@@ -62,7 +62,7 @@ const NodeSchema = z.union([
   OtherNodeSchema,
 ]);
 
-const EdgeSchema = z.object({
+export const EdgeSchema = z.object({
   source: z.string().describe('The id of the source node'),
   target: z.string().describe('The id of the target node'),
   label: z.string().describe(`The label of the edge. Allowed values: ${edgeTypes.join(', ')}`),

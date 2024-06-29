@@ -1,8 +1,10 @@
 # Building a podcast knowledge graph with LLMs
 
+![Knowledge graph LLM flow](./docs/kg-llm-flow.png)
+
 ## Getting started
 
-```bash
+```shell
 $ pnpm install
 ```
 
@@ -10,7 +12,7 @@ Edit `.env` and set the `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` environment var
 
 The script `src/index.ts` will read the transcript from `examples/output.json` and use the `buildGraph` function to build a knowledge graph:
 
-```bash
+```shell
 $ npx tsx src/index.ts
 ```
 
@@ -18,8 +20,33 @@ The raw knowledge graph will be written to `kg.json` and the knowledge graph in 
 
 If you have [Graphviz](https://graphviz.org/) installed, you can visualize the knowledge graph with:
 
-```bash
+```shell
 $ dot -Tpng -o kg.png kg.dot
+```
+
+## Loading results into a graph DB
+
+Standalone JSON files of the knowledge graph are not very useful by themselves. We need to be able to query the graph and do more complex operations. For this we'll use the.
+[Kuzu](https://kuzudb.com/) graph database.
+
+Unlike Neo4J and some other graph DBs, Kuzu requires a database schema to be defined up front. We'll use the actual KG constructed by the LLM combined with the node definitions in our `src/schema.ts` file to define the schema.
+
+The database specific code is in `src/db.ts` and a wrappre script to load the KG into the database is in `src/indexer.ts`:
+
+```shell
+$ npx ts src/indexer.ts
+```
+
+You can connect to the database with the Kuzu CLI:
+
+```shell
+$ kuzu ./demo_db
+```
+
+And run any Cypher query it supports, for example, finding all the relationships between the "Perplexity" organization and any node:
+
+```cypher
+MATCH (o:Organization)-[r]->(n) WHERE o.label = 'Perplexity' RETURN r,n;
 ```
 
 ## Notes

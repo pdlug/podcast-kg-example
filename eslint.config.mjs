@@ -15,6 +15,9 @@ export default [
   eslintPluginUnicorn.configs['flat/recommended'],
   functional.configs.lite,
   {
+    ignores: ['typings/*'],
+  },
+  {
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -26,7 +29,8 @@ export default [
       'functional/no-loop-statements': 'off',
       'functional/no-mixed-types': 'off',
       'functional/no-return-void': 'off',
-      //'functional/prefer-immutable-types': 'off',
+      'functional/prefer-immutable-types': 'off',
+      'functional/no-throw-statements': 'off',
       'sort-imports': [
         'error',
         {
