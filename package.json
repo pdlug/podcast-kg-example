@@ -1,7 +1,7 @@
 {
   "name": "podcast-kg-example",
   "scripts": {
-    "dev": "tsx src/main.ts && dot -Tpng -o kg.png kg.dot",
+    "dev": "tsx src/index.ts && dot -Tpng -o kg.png kg.dot",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier --write .",
     "fix:lint": "eslint --fix src",

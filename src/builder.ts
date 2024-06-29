@@ -34,9 +34,9 @@ const modelProviders = {
 };
 
 const systemPrompt = `
-  You are a knowledge graph builder. Use the schema of the nodes and edges described in the JSON schema to build a knowledge graph that is a complete and accurate representation of the content.
+  You are a knowledge graph builder, use the supplied JSON schema to build a knowledge graph that is a complete and accurate representation of the content. You must only use the node types and edge types defined in the schema.
 
-  Include all mentions of people, organizations, technologies, products, and concepts in the knowledge graph.
+  Be comprehensive and include all mentions of people, organizations, technologies, products, concepts, etc. in the knowledge graph. Use as fine grained a granularity as possible and link to parents where applicable. For example, if a technology like "React" is mentioned, link it to the "JavaScript" technology and also the "Frontend" concept.
 `;
 
 export async function buildGraph(provider: keyof typeof modelProviders, model: string, input: string) {

@@ -1,6 +1,17 @@
 import { z } from 'zod';
 
-const edgeTypes = ['HAS_EPISODE', 'HAS_HOST', 'HAS_GUEST', 'MENTIONS', 'KNOWS', 'WORKS_AT', 'USES'];
+const edgeTypes = [
+  'HAS_EPISODE',
+  'HAS_HOST',
+  'HAS_GUEST',
+  'INTERVIEWS',
+  'MENTIONS',
+  'KNOWS',
+  'WORKS_AT',
+  'USES',
+  'RELATED_TO',
+  'CHILD_OF',
+];
 
 const BaseNodeSchema = z.object({
   id: z.string().describe('The id of the node as a number'),
@@ -8,49 +19,47 @@ const BaseNodeSchema = z.object({
   type: z.string().describe('The type of node'),
 });
 
-const PodcastSchema = BaseNodeSchema.extend({
+const PodcastNodeSchema = BaseNodeSchema.extend({
   type: z.literal('Podcast'),
-  name: z.string().describe('The name of the podcast'),
 }).describe('A podcast');
 
-const EpisodeSchema = BaseNodeSchema.extend({
+const EpisodeNodeSchema = BaseNodeSchema.extend({
   type: z.literal('Episode'),
-  title: z.string().describe('The title of the episode'),
 }).describe('An episode of a podcast');
 
-const OrganizationSchema = BaseNodeSchema.extend({
+const OrganizationNodeSchema = BaseNodeSchema.extend({
   type: z.literal('Organization'),
-  name: z.string().describe('The name of the organization'),
 }).describe('An organization like a company or university');
 
-const PersonSchema = BaseNodeSchema.extend({
+const PersonNodeSchema = BaseNodeSchema.extend({
   type: z.literal('Person'),
-  name: z.string().describe('The name of the person'),
 }).describe('A person');
 
-const TechnologySchema = BaseNodeSchema.extend({
+const TechnologyNodeSchema = BaseNodeSchema.extend({
   type: z.literal('Technology'),
-  name: z.string().describe('The name of the technology'),
 }).describe('A technology like a programming language or framework');
 
-const ProductSchema = BaseNodeSchema.extend({
+const ProductNodeSchema = BaseNodeSchema.extend({
   type: z.literal('Product'),
-  name: z.string().describe('The name of the product'),
 }).describe('A product like a software or hardware product');
 
-const ConceptSchema = BaseNodeSchema.extend({
+const ConceptNodeSchema = BaseNodeSchema.extend({
   type: z.literal('Concept'),
-  name: z.string().describe('The name of the concept'),
 }).describe('A concept like a domain, idea, topic, or abstract thought');
 
-const NodeSchema = z.discriminatedUnion('type', [
-  PodcastSchema,
-  EpisodeSchema,
-  OrganizationSchema,
-  PersonSchema,
-  TechnologySchema,
-  ProductSchema,
-  ConceptSchema,
+const OtherNodeSchema = BaseNodeSchema.extend({
+  type: z.string().describe('The type of node'),
+}).describe('A node of an unknown type');
+
+const NodeSchema = z.union([
+  PodcastNodeSchema,
+  EpisodeNodeSchema,
+  OrganizationNodeSchema,
+  PersonNodeSchema,
+  TechnologyNodeSchema,
+  ProductNodeSchema,
+  ConceptNodeSchema,
+  OtherNodeSchema,
 ]);
 
 const EdgeSchema = z.object({
