@@ -3,7 +3,7 @@
 import eslint from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
-import functional from 'eslint-plugin-functional/flat';
+import functional from 'eslint-plugin-functional';
 import tseslint from 'typescript-eslint';
 
 import typescriptParser from '@typescript-eslint/parser';

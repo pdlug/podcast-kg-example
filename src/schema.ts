@@ -14,7 +14,7 @@ const edgeTypes = [
 ];
 
 const BaseNodeSchema = z.object({
-  id: z.string().describe('The id of the node as a number'),
+  id: z.string().describe('The id of the node as a number without a leading zero.'),
   label: z.string(),
   type: z.string().describe('The type of node'),
 });
@@ -63,8 +63,8 @@ export const NodeSchema = z.union([
 ]);
 
 export const EdgeSchema = z.object({
-  source: z.string().describe('The id of the source node'),
-  target: z.string().describe('The id of the target node'),
+  source: z.string().describe('The id of the source node. Do not include leading zeros if using numbers.'),
+  target: z.string().describe('The id of the target node. Do not include leading zeros if using numbers.'),
   label: z.string().describe(`The label of the edge. Allowed values: ${edgeTypes.join(', ')}`),
 });
 

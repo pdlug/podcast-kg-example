@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 
-import { buildGraph } from './builder';
+import { buildGraph, validateGraph } from './builder';
 import { kgToDOT } from './dot';
 
 const content = fs.readFileSync('./examples/lex_ai_aravind_srinivas.json', 'utf8');
@@ -18,7 +18,13 @@ Title: Aravind Srinivas: Perplexity CEO on Future of AI, Search & the Internet
 ${transcript}
 `;
 
-const graph = await buildGraph('openai', 'gpt-4o', text);
+console.time('Execution Time');
+
+const graph = await buildGraph('openai', 'gpt-4o-mini', text);
+
+console.timeEnd('Execution Time');
+
+validateGraph(graph);
 
 fs.writeFileSync('./kg.json', JSON.stringify(graph, undefined, 2));
 fs.writeFileSync('./kg.dot', kgToDOT(graph));

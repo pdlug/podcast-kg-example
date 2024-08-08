@@ -54,7 +54,7 @@ function generateKuzuNodeTables(nodes: Readonly<KnowledgeGraph['nodes']>) {
       .filter(([key]) => key !== 'type')
       .map(([key, value]) => `${key} ${zodToKuzuType(value)}`);
 
-    return `CREATE NODE TABLE ${nodeType} (${nodeProperties.join(', ')}, PRIMARY KEY (id));`;
+    return `CREATE NODE TABLE IF NOT EXISTS ${nodeType} (${nodeProperties.join(', ')}, PRIMARY KEY (id));`;
   });
 
   return statements;
@@ -82,7 +82,7 @@ function generateKuzuEdgeTables(kg: Readonly<KnowledgeGraph>) {
     .join(', ');
 
   const statements = [...edgeTypes].map((edgeType) => {
-    return `CREATE REL TABLE GROUP ${edgeType} (${nodePairings}, ${edgeProperties});`;
+    return `CREATE REL TABLE GROUP IF NOT EXISTS ${edgeType} (${nodePairings}, ${edgeProperties});`;
   });
 
   return statements;
@@ -99,36 +99,6 @@ function generateKuzuTables(graph: Readonly<KnowledgeGraph>) {
 }
 
 /**
- * Generate statements to create the nodes and edges in the graph. Kuzu requires the node type in the create
- * relationship statements, e.g.: we must do
- * `MATCH (n1:Concept), (n2:Concept) WHERE ... MERGE (n1)-[:RELATED]->(n2)`
- *
- * Rather than:
- * `MATCH (n1), (n2) WHERE ... MERGE (n1)-[:RELATED]->(n2)`
- *
- * Which is why we need to keep an index of node ID to node type.
- *
- * @param graph
- * @returns
- */
-function generateInsertStatements(graph: Readonly<KnowledgeGraph>) {
-  const nodeStatements = graph.nodes.map(
-    (node) => `CREATE (n:${node.type} {id: '${node.id}', label: '${node.label}'})`,
-  );
-
-  const nodeIdToType = new Map(graph.nodes.map((node) => [node.id, node.type]));
-
-  const edgeStatements = graph.edges.map(
-    (edge) =>
-      `MATCH (n1:${nodeIdToType.get(edge.source)}), (n2:${nodeIdToType.get(edge.target)})
-       WHERE n1.id = '${edge.source}' AND n2.id ='${edge.target}'
-       MERGE (n1)-[:${edge.label}]->(n2)`,
-  );
-
-  return [...nodeStatements, ...edgeStatements];
-}
-
-/**
  * Create the database structure.
  *
  * @param conn
@@ -141,13 +111,55 @@ export async function createDB(conn: Readonly<kuzu.Connection>, kg: Readonly<Kno
 }
 
 /**
+ * Insert the nodes into the database.
+ *
+ * @param conn
+ * @param kg
+ */
+async function insertNodes(conn: Readonly<kuzu.Connection>, kg: Readonly<KnowledgeGraph>) {
+  for (const node of kg.nodes) {
+    const nodeStmt = await conn.prepare(`CREATE (n:${node.type} {id: $id, label: $label})`);
+    await conn.execute(nodeStmt, { id: node.id, label: node.label });
+  }
+}
+
+/**
+ * Insert the edges into the database. Kuzu requires the node type in the create
+ * relationship statements, e.g.: we must do
+ * `MATCH (n1:Concept), (n2:Concept) WHERE ... MERGE (n1)-[:RELATED]->(n2)`
+ *
+ * Rather than:
+ * `MATCH (n1), (n2) WHERE ... MERGE (n1)-[:RELATED]->(n2)`
+ *
+ * Which is why we need to generate a mapping of node ID to node type.
+ *
+ * @param conn
+ * @param kg
+ */
+async function insertEdges(conn: Readonly<kuzu.Connection>, kg: Readonly<KnowledgeGraph>) {
+  const nodeIdToType = new Map(kg.nodes.map((node) => [node.id, node.type]));
+
+  for (const edge of kg.edges) {
+    const edgeStmt = await conn.prepare(`
+      MATCH (n1:${nodeIdToType.get(edge.source)}), (n2:${nodeIdToType.get(edge.target)})
+      WHERE n1.id = $source AND n2.id = $target
+      MERGE (n1)-[:${edge.label}]->(n2)
+    `);
+
+    await conn.execute(edgeStmt, {
+      source: edge.source,
+      target: edge.target,
+    });
+  }
+}
+
+/**
  * Load the knowledge graph into the database.
  *
  * @param conn
  * @param kg
  */
 export async function loadKnowledgeGraph(conn: Readonly<kuzu.Connection>, kg: Readonly<KnowledgeGraph>) {
-  for (const statement of generateInsertStatements(kg)) {
-    await conn.query(statement);
-  }
+  await insertNodes(conn, kg);
+  await insertEdges(conn, kg);
 }
