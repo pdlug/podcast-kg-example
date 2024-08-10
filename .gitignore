@@ -48,12 +48,6 @@ Thumbs.db
 npm-debug.log
 yarn-error.log
 
-# Change them to your taste:
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-bun.lockb
-
 kg.json
 kg.dot
 kg.png
