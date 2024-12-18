@@ -1,7 +1,15 @@
 import * as fs from 'node:fs';
 
+import { createOpenAI } from '@ai-sdk/openai';
+
 import { buildGraph, validateGraph } from './builder';
 import { kgToDOT } from './dot';
+
+import env from './env';
+
+const openai = createOpenAI({ apiKey: env.OPENAI_API_KEY });
+
+const model = openai('gpt-4o-mini');
 
 const content = fs.readFileSync('./examples/lex_ai_aravind_srinivas.json', 'utf8');
 
@@ -20,7 +28,7 @@ ${transcript}
 
 console.time('Execution Time');
 
-const graph = await buildGraph('openai', 'gpt-4o-mini', text);
+const graph = await buildGraph(model, text);
 
 console.timeEnd('Execution Time');
 

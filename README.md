@@ -8,12 +8,12 @@
 $ pnpm install
 ```
 
-Edit `.env` and set the `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` environment variables.
+Edit `.env` and set the `OPENAI_API_KEY` environment variables.
 
 The script `src/index.ts` will read the transcript from `examples/output.json` and use the `buildGraph` function to build a knowledge graph:
 
 ```shell
-$ npx tsx src/index.ts
+$ pnpm exec tsx src/index.ts
 ```
 
 The raw knowledge graph will be written to `kg.json` and the knowledge graph in DOT format will be written to `kg.dot`.
