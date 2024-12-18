@@ -1,16 +1,16 @@
-import kuzu from 'kuzu';
+import kuzu from "kuzu";
 
-import { EdgeSchema, NodeSchema, type KnowledgeGraph } from './schema';
-import type { ZodTypeAny } from 'zod';
+import { EdgeSchema, NodeSchema, type KnowledgeGraph } from "./schema";
+import type { ZodTypeAny } from "zod";
 
 const zodToKuzuTypeMap: Record<string, string> = {
-  ZodString: 'STRING',
-  ZodNumber: 'INT64',
-  ZodBigInt: 'INT64',
-  ZodBoolean: 'BOOLEAN',
-  ZodDate: 'DATE',
-  ZodNull: 'NULL',
-  ZodLiteral: 'STRING',
+  ZodString: "STRING",
+  ZodNumber: "INT64",
+  ZodBigInt: "INT64",
+  ZodBoolean: "BOOLEAN",
+  ZodDate: "DATE",
+  ZodNull: "NULL",
+  ZodLiteral: "STRING",
 } as const;
 
 /**
@@ -36,25 +36,29 @@ function zodToKuzuType(zodType: Readonly<ZodTypeAny>) {
  * @param nodes
  * @returns
  */
-function generateKuzuNodeTables(nodes: Readonly<KnowledgeGraph['nodes']>) {
+function generateKuzuNodeTables(nodes: Readonly<KnowledgeGraph["nodes"]>) {
   const nodeTypes = new Set(nodes.map((node) => node.type));
 
-  const defaultNodeSchema = NodeSchema.options.find((node) => node.shape.type._def.typeName === 'ZodString');
+  const defaultNodeSchema = NodeSchema.options.find(
+    (node) => node.shape.type._def.typeName === "ZodString",
+  );
   if (!defaultNodeSchema) {
-    throw new Error('Could not find default node schema');
+    throw new Error("Could not find default node schema");
   }
 
   const statements = [...nodeTypes].map((nodeType) => {
     const nodeSchema =
       NodeSchema.options.find(
-        (node) => node.shape.type._def.typeName === 'ZodLiteral' && node.shape.type._def.value === nodeType,
+        (node) =>
+          node.shape.type._def.typeName === "ZodLiteral" &&
+          node.shape.type._def.value === nodeType,
       ) ?? defaultNodeSchema;
 
     const nodeProperties = Object.entries(nodeSchema.shape)
-      .filter(([key]) => key !== 'type')
+      .filter(([key]) => key !== "type")
       .map(([key, value]) => `${key} ${zodToKuzuType(value)}`);
 
-    return `CREATE NODE TABLE IF NOT EXISTS ${nodeType} (${nodeProperties.join(', ')}, PRIMARY KEY (id));`;
+    return `CREATE NODE TABLE IF NOT EXISTS ${nodeType} (${nodeProperties.join(", ")}, PRIMARY KEY (id));`;
   });
 
   return statements;
@@ -73,13 +77,15 @@ function generateKuzuEdgeTables(kg: Readonly<KnowledgeGraph>) {
 
   // enumerate all possible node pairs
   const nodePairings = [...nodeTypes].map((nodeType) =>
-    [...nodeTypes].map((nodeType2) => `FROM ${nodeType} TO ${nodeType2}`).join(', '),
+    [...nodeTypes]
+      .map((nodeType2) => `FROM ${nodeType} TO ${nodeType2}`)
+      .join(", "),
   );
 
   const edgeProperties = Object.entries(EdgeSchema.shape)
-    .filter(([key]) => ['source', 'target'].includes(key))
+    .filter(([key]) => ["source", "target"].includes(key))
     .map(([key, value]) => `${key} ${zodToKuzuType(value)}`)
-    .join(', ');
+    .join(", ");
 
   const statements = [...edgeTypes].map((edgeType) => {
     return `CREATE REL TABLE GROUP IF NOT EXISTS ${edgeType} (${nodePairings}, ${edgeProperties});`;
@@ -95,7 +101,10 @@ function generateKuzuEdgeTables(kg: Readonly<KnowledgeGraph>) {
  * @returns
  */
 function generateKuzuTables(graph: Readonly<KnowledgeGraph>) {
-  return [...generateKuzuNodeTables(graph.nodes), ...generateKuzuEdgeTables(graph)];
+  return [
+    ...generateKuzuNodeTables(graph.nodes),
+    ...generateKuzuEdgeTables(graph),
+  ];
 }
 
 /**
@@ -104,7 +113,10 @@ function generateKuzuTables(graph: Readonly<KnowledgeGraph>) {
  * @param conn
  * @param kg
  */
-export async function createDB(conn: Readonly<kuzu.Connection>, kg: Readonly<KnowledgeGraph>) {
+export async function createDB(
+  conn: Readonly<kuzu.Connection>,
+  kg: Readonly<KnowledgeGraph>,
+) {
   for (const statement of generateKuzuTables(kg)) {
     await conn.query(statement);
   }
@@ -116,9 +128,14 @@ export async function createDB(conn: Readonly<kuzu.Connection>, kg: Readonly<Kno
  * @param conn
  * @param kg
  */
-async function insertNodes(conn: Readonly<kuzu.Connection>, kg: Readonly<KnowledgeGraph>) {
+async function insertNodes(
+  conn: Readonly<kuzu.Connection>,
+  kg: Readonly<KnowledgeGraph>,
+) {
   for (const node of kg.nodes) {
-    const nodeStmt = await conn.prepare(`CREATE (n:${node.type} {id: $id, label: $label})`);
+    const nodeStmt = await conn.prepare(
+      `CREATE (n:${node.type} {id: $id, label: $label})`,
+    );
     await conn.execute(nodeStmt, { id: node.id, label: node.label });
   }
 }
@@ -136,7 +153,10 @@ async function insertNodes(conn: Readonly<kuzu.Connection>, kg: Readonly<Knowled
  * @param conn
  * @param kg
  */
-async function insertEdges(conn: Readonly<kuzu.Connection>, kg: Readonly<KnowledgeGraph>) {
+async function insertEdges(
+  conn: Readonly<kuzu.Connection>,
+  kg: Readonly<KnowledgeGraph>,
+) {
   const nodeIdToType = new Map(kg.nodes.map((node) => [node.id, node.type]));
 
   for (const edge of kg.edges) {
@@ -159,7 +179,10 @@ async function insertEdges(conn: Readonly<kuzu.Connection>, kg: Readonly<Knowled
  * @param conn
  * @param kg
  */
-export async function loadKnowledgeGraph(conn: Readonly<kuzu.Connection>, kg: Readonly<KnowledgeGraph>) {
+export async function loadKnowledgeGraph(
+  conn: Readonly<kuzu.Connection>,
+  kg: Readonly<KnowledgeGraph>,
+) {
   await insertNodes(conn, kg);
   await insertEdges(conn, kg);
 }

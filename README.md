@@ -34,7 +34,7 @@ Unlike Neo4J and some other graph DBs, Kuzu requires a database schema to be def
 The database specific code is in `src/db.ts` and a wrappre script to load the KG into the database is in `src/indexer.ts`:
 
 ```shell
-$ npx tsx src/indexer.ts
+$ pnpm exec tsx src/indexer.ts
 ```
 
 You can connect to the database with the Kuzu CLI:

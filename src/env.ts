@@ -1,6 +1,6 @@
-import 'dotenv/config';
+import "dotenv/config";
 
-import { z } from 'zod';
+import { z } from "zod";
 
 const envSchema = z.object({
   OPENAI_API_KEY: z.string(),

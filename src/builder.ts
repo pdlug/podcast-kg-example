@@ -1,6 +1,6 @@
-import { generateObject, type LanguageModelV1 } from 'ai';
+import { generateObject, type LanguageModelV1 } from "ai";
 
-import { KnowledgeGraphSchema, type KnowledgeGraph } from './schema';
+import { KnowledgeGraphSchema, type KnowledgeGraph } from "./schema";
 
 const systemPrompt = `
   You are a knowledge graph builder, use the supplied JSON schema to build a knowledge graph that is a complete and accurate representation of the content. You must only use the node types and edge types defined in the schema.
@@ -13,11 +13,11 @@ export async function buildGraph(model: LanguageModelV1, input: string) {
     model,
     messages: [
       {
-        role: 'system',
+        role: "system",
         content: systemPrompt,
       },
       {
-        role: 'user',
+        role: "user",
         content: input,
       },
     ],
