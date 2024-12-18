@@ -14,27 +14,26 @@
   "type": "module",
   "dependencies": {
     "@instructor-ai/instructor": "^1.5.0",
-    "kuzu": "^0.5.0",
-    "llm-polyglot": "^2.1.0",
-    "openai": "^4.55.4",
-    "zod": "^3.23.8"
+    "kuzu": "^0.7.0",
+    "llm-polyglot": "^2.3.1",
+    "openai": "^4.77.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240806.0",
-    "@eslint/js": "^9.9.0",
-    "@types/node": "^22.2.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.1",
-    "@typescript-eslint/parser": "^8.0.1",
-    "dotenv": "^16.4.5",
-    "eslint": "^9.9.0",
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-functional": "^7.0.1",
-    "eslint-plugin-unicorn": "^55.0.0",
+    "eslint-plugin-functional": "^7.1.0",
+    "eslint-plugin-unicorn": "^56.0.1",
     "npm-run-all": "^4.1.5",
-    "prettier": "^3.3.3",
-    "tsx": "^4.17.0",
-    "typescript": "^5.5.4",
-    "typescript-eslint": "^8.0.1"
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.1"
   },
   "packageManager": "pnpm@9.7.0"
 }
