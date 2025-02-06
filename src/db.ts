@@ -88,7 +88,7 @@ function generateKuzuEdgeTables(kg: Readonly<KnowledgeGraph>) {
     .join(", ");
 
   const statements = [...edgeTypes].map((edgeType) => {
-    return `CREATE REL TABLE GROUP IF NOT EXISTS ${edgeType} (${nodePairings}, ${edgeProperties});`;
+    return `CREATE REL TABLE IF NOT EXISTS ${edgeType} (${nodePairings}, ${edgeProperties});`;
   });
 
   return statements;
