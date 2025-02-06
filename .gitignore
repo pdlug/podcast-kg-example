@@ -55,3 +55,8 @@ kg.svg
 
 demo_db
 history.txt
+
+# PromptFoo artifacts
+evalLastWritten
+promptfoo-errors.log
+promptfoo.yaml
